@@ -781,39 +781,6 @@ wss.on('connection', (ws, req) => {
 });
 
 // ============================================================
-// ERROR HANDLER
-// ============================================================
-app.use((err, req, res, next) => {
-  console.error('[Server] Unhandled error:', err);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-// 404
-app.use((req, res) => {
-  res.status(404).json({ error: `Route not found: ${req.method} ${req.path}` });
-});
-
-// ============================================================
-// START SERVER
-// ============================================================
-server.listen(PORT, () => {
-  console.log('');
-  console.log('  ███████╗████████╗██████╗     ███████╗ ██████╗██╗  ██╗ ██████╗ ');
-  console.log('  ██╔════╝╚══██╔══╝██╔══██╗    ██╔════╝██╔════╝██║  ██║██╔═══██╗');
-  console.log('  █████╗     ██║   ██████╔╝    █████╗  ██║     ███████║██║   ██║');
-  console.log('  ██╔══╝     ██║   ██╔═══╝     ██╔══╝  ██║     ██╔══██║██║   ██║');
-  console.log('  ██║        ██║   ██║         ███████╗╚██████╗██║  ██║╚██████╔╝');
-  console.log('  ╚═╝        ╚═╝   ╚═╝         ╚══════╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ');
-  console.log('');
-  console.log(`  Server running on port ${PORT}`);
-  console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`  Frontend: ${FRONTEND_URL}`);
-  console.log(`  Supabase: ${supabase ? 'connected' : 'not configured'}`);
-  console.log('');
-});
-
-// Graceful shutdown
-// ============================================================
 // FTP Echo — PayPal + Supabase Account Management Routes
 // Add these routes to your existing index.js
 // ============================================================
@@ -1179,8 +1146,32 @@ app.post('/admin/upgrade', async (req, res) => {
   }
 });
 
+// ============================================================
+// ERROR HANDLER
+// ============================================================
+app.use((err, req, res, next) => {
+  console.error('[Server] Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// 404
+app.use((req, res) => {
+  res.status(404).json({ error: `Route not found: ${req.method} ${req.path}` });
+});
+
+// ============================================================
+// START SERVER
+// ============================================================
+server.listen(PORT, () => {
+  console.log('');
+  console.log('  FTP ECHO SERVER');
+  console.log(`  Port: ${PORT}`);
+  console.log(`  Mode: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`  Supabase: ${process.env.SUPABASE_URL ? 'connected' : 'not configured'}`);
+  console.log('  Ready.\n');
+});
+
 process.on('SIGTERM', () => {
-  console.log('[Server] Shutting down...');
   for (const [, entry] of ftpPool.entries()) {
     try { entry.client.close(); } catch {}
   }
